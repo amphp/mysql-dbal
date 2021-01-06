@@ -1,0 +1,22 @@
+{
+    "name": "amphp/mysql-dbal",
+    "type": "library",
+    "require": {
+        "amphp/amp": "^3",
+        "amphp/mysql": "^3",
+        "doctrine/dbal": "^3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Niklas Keller",
+            "email": "me@kelunik.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Amp\\Mysql\\DBAL\\": "src"
+        }
+    }
+}
