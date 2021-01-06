@@ -4,7 +4,7 @@
     "require": {
         "amphp/amp": "^3",
         "amphp/mysql": "^3",
-        "doctrine/dbal": "^3"
+        "doctrine/dbal": "^2.12.1"
     },
     "license": "MIT",
     "authors": [

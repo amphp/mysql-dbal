@@ -4,6 +4,7 @@ namespace Amp\Mysql\DBAL;
 
 use Amp\Mysql\Connection as SqlConnection;
 use Amp\Mysql\Result as SqlResult;
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\Driver\Statement;
@@ -11,7 +12,7 @@ use Doctrine\DBAL\ParameterType;
 use function Amp\await;
 use function Amp\Pipeline\discard;
 
-class MysqlConnection implements ServerInfoAwareConnection
+class MysqlConnection implements Connection, ServerInfoAwareConnection
 {
     private SqlConnection $connection;
     private \Closure $resultListener;
@@ -23,7 +24,7 @@ class MysqlConnection implements ServerInfoAwareConnection
         $this->resultListener = fn(SqlResult $result) => $this->lastInsertId = $result->getLastInsertId();
     }
 
-    public function prepare(string $sql): Statement
+    public function prepare($sql): Statement
     {
         try {
             return new MysqlStatement($this->connection->prepare($sql), $this->resultListener);
@@ -32,13 +33,13 @@ class MysqlConnection implements ServerInfoAwareConnection
         }
     }
 
-    public function query(string $sql): Result
+    public function query(): Statement
     {
         try {
-            $result = $this->connection->query($sql);
-            ($this->resultListener)($result);
+            $statement = $this->prepare(\func_get_arg(0));
+            $statement->execute();
 
-            return new MysqlResult($result);
+            return $statement;
         } catch (\Throwable $e) {
             throw MysqlException::new($e);
         }
@@ -49,7 +50,7 @@ class MysqlConnection implements ServerInfoAwareConnection
         throw new \Error("Not implemented, use prepared statements");
     }
 
-    public function exec(string $sql): int
+    public function exec($sql): int
     {
         try {
             $result = $this->connection->execute($sql);
@@ -102,5 +103,23 @@ class MysqlConnection implements ServerInfoAwareConnection
     public function getServerVersion(): string
     {
         return $this->query("SELECT @@version")->fetchOne();
+    }
+
+    public function errorCode(): ?string
+    {
+        return null;
+    }
+
+    public function errorInfo(): array
+    {
+        return [
+            'Error info unavailable',
+            $this->errorCode(),
+        ];
+    }
+
+    public function requiresQueryForServerVersion(): bool
+    {
+        return false;
     }
 }

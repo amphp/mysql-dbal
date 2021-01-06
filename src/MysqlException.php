@@ -8,6 +8,6 @@ final class MysqlException extends AbstractException
 {
     public static function new(\Throwable $exception): self
     {
-        return new self($exception->getMessage(), null, $exception->getCode(), $exception);
+        return new self($exception->getMessage(), null, $exception->getCode());
     }
 }

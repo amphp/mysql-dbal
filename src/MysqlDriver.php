@@ -11,11 +11,11 @@ use function Amp\Socket\connector;
 
 final class MysqlDriver extends Driver\AbstractMySQLDriver
 {
-    public function connect(array $params): Connection
+    public function connect(array $params, $username = null, $password = null, array $driverOptions = []): Connection
     {
         $config = new ConnectionConfig($params['host'] ?? 'localhost',
             $params['port'] ?? ConnectionConfig::DEFAULT_PORT,
-            $params['user'] ?? '', $params['password'] ?? '', $params['dbname'] ?? null, null,
+            $params['user'] ?? $username ?? '', $params['password'] ?? $password ?? '', $params['dbname'] ?? null, null,
             $params['charset'] ?? ConnectionConfig::DEFAULT_CHARSET);
 
         $connector = connector();
@@ -28,5 +28,10 @@ final class MysqlDriver extends Driver\AbstractMySQLDriver
         } catch (\Throwable $e) {
             throw MysqlException::new($e);
         }
+    }
+
+    public function getName(): string
+    {
+        return 'amphp/mysql';
     }
 }
