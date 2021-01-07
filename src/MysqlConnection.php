@@ -102,7 +102,7 @@ class MysqlConnection implements Connection, ServerInfoAwareConnection
 
     public function getServerVersion(): string
     {
-        return $this->query("SELECT @@version")->fetchOne();
+        return $this->query("SELECT @@version")->fetchColumn(0);
     }
 
     public function errorCode(): ?string
